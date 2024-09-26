@@ -1,25 +1,9 @@
 console.log("start");
-// document.body.appendChild(Object.assign(document.createElement("script"), { type: "text/javascript", src: "./web3modal.js" }));
-// document.body.appendChild(Object.assign(document.createElement("script"), { type: "text/javascript", src: "./web3.min.js" }));
-// Create script elements and set their src attributes
-////const web3ModalScript = document.createElement("script");
-////web3ModalScript.type = "text/javascript";
-////web3ModalScript.src = "./web3modal.js";
-
-////const web3Script = document.createElement("script");
-////web3Script.type = "text/javascript";
-//dont know what version you got
-////web3Script.src = "./web3.min.js";
-
-//const web3 = new Web3(Web3.givenProvider) ;
 
 var providerNEW;
 var signerNEW;
 var userAccountNEW;
 const MasterChainID = 64165; //250 is Fantom Mainnet, 64165
-
-
- 
 
  const call_type = {
   CONNECT: 1,
@@ -27,15 +11,15 @@ const MasterChainID = 64165; //250 is Fantom Mainnet, 64165
   FULL_SCREEN: 3,
 };
 
-  const response_type = {
-    ERROR   : 1,
-    HASH    : 2,
-    RECEIPT : 3,
-    ACCOUNT_NUMBER: 4,
-    READ_RESPONSE: 5,
-    ROTATE: 6,
-    UPDATE: 7,
-  };
+const response_type = {
+  ERROR   : 1,
+  HASH    : 2,
+  RECEIPT : 3,
+  ACCOUNT_NUMBER: 4,
+  READ_RESPONSE: 5,
+  ROTATE: 6,
+  UPDATE: 7,
+};
 
 
 
@@ -67,7 +51,18 @@ async function ConnectWallet(){
     // requests through MetaMask.
     providerNEW = new ethers.BrowserProvider(window.ethereum)
     console.log(window.ethereum);
+    const network = await providerNEW.getNetwork();
+    var chainId = network.chainId;
+    // Convert chainId to a number before comparison
+    chainId = parseInt(chainId, 10);
+    console.log("Chain ID:", chainId);
 
+    // Check if chain ID is not 250
+    if (chainId !== MasterChainID) {
+      switchToFantom();
+      alert("Switch to Fantom Network before Connecting."); // Display alert pop-up
+      return;
+    }
     // It also provides an opportunity to request access to write
     // operations, which will be performed by the private key
     // that MetaMask manages for the user.
@@ -90,11 +85,14 @@ async function ConnectWallet(){
 
   console.log("ConnectWallet() getweb3 done");
 
-  import("./reroute.js")
-  // walkaround();
 
   response(response_type.ACCOUNT_NUMBER, userAccountNEW);
 }
+
+
+import("./reroute.js")
+// walkaround();
+
 
 var isfullscreen = false;
 function EnterFullScreen(){
@@ -259,7 +257,8 @@ async function readContract(id, method, abi, contract, args) {
 }
 //---------------------------------- SEND --------------------------------------------------------------------------------
 async function sendContract(id, method, abi, contract, args, value, gasLimit, gasPrice) {
-// Get network object
+  // Get network object
+  providerNEW = new ethers.BrowserProvider(window.ethereum);
   const network = await providerNEW.getNetwork();
   var chainId = network.chainId;
   // Convert chainId to a number before comparison
@@ -268,92 +267,43 @@ async function sendContract(id, method, abi, contract, args, value, gasLimit, ga
 
   // Check if chain ID is not 250
   if (chainId !== MasterChainID) {
-    response(response_type.ERROR, method + "_%%_" + "wrong RPC, switch to Fantom Mainnet and Restart/Refresh(F5).");
+    switchToFantom();
+    response(response_type.ERROR, method + "_%%_" + "wrong RPC, switch to Fantom Network and Retry.");
   } else {
     //const from = (await web3.eth.getAccounts())[0];
     const contracts = new ethers.Contract(contract, abi, providerNEW);
-		const contractWithSigner = contracts.connect(signerNEW);
-	  
+    const contractWithSigner = contracts.connect(signerNEW);
+    
     var options = {};
     if (gasLimit != "") { options.gasLimit = gasLimit; }
     if (gasPrice != "") { options.gasPrice = gasPrice; }
     if (value    != "") { options.value    = value; }
 
-	  console.log("waiting metamask");
+    console.log("waiting metamask");
     
     //console.log(from)
     console.log(id)
     console.log(contract)
     console.log(method)
     console.log(args)
-	  console.log(options);
+    console.log(options);
     console.log(value)
     console.log(gasLimit)
     console.log(gasPrice)
-
-
-    // args = "[\"0xC69658BC4Ec4e903Bc0A04e50705A5225Aa88dfc\", 1]";
-    // console.log(args)
-/*
-    new web3.eth.Contract(JSON.parse(abi), contract).methods[method](...JSON.parse(args))
-        .send({
-          from,
-          value,
-          gas: gasLimit ? gasLimit : undefined,
-          gasPrice: gasPrice ? gasPrice : undefined,
-        })
-        .on("transactionHash", (transactionHash) => {
-          response(response_type.HASH, transactionHash)
-        })
-        .on("error", (error) => {
-          response(response_type.ERROR, error.message)
-        })
-        .on("receipt", function(receipt) {
-  
-          receipt["method"] = method;
-          console.log(method);
-          console.log(String(receipt));
-          response(response_type.RECEIPT, JSON.stringify(receipt))
-          
-        });*/
-/*
-        try {
-          const result = await new web3.eth.Contract(JSON.parse(abi), contract)
-            .methods[method](...JSON.parse(args))
-            .send({
-              from,
-              value,
-              gas: gasLimit ? gasLimit : undefined,
-              gasPrice: gasPrice ? gasPrice : undefined,
-            });
-          console.log("result is...", result);
-          if (result.status) {
-            const receipt = await web3.eth.getTransactionReceipt(result.transactionHash);
-            console.log("hheelloo", receipt);
-            receipt["method"] = method;
-            console.log(method);
-            console.log(String(receipt));
-            response(response_type.RECEIPT, JSON.stringify(receipt));
-          } else {
-            throw new Error("Transaction failed");
-          }
-        } catch (error) {
-          response(response_type.ERROR, error.message);
-        }
-*/
-try {
-  console.log("HERE123");
+    
+    try {
+      console.log("HERE123");
       console.log(...JSON.parse(args));
       const transaction = await contractWithSigner[method](...JSON.parse(args), options);
       console.log("HERE321");
-		  const startTime = new Date();
-		  // Wait for the transaction to be mined and get receipt
+      const startTime = new Date();
+      // Wait for the transaction to be mined and get receipt
       console.log(transaction.hash);
       response(response_type.HASH, method);
       const receipt = await getTransactionReceiptWithRetry(transaction.hash, 120);
       console.log("USE OTHER METHOD",receipt )
       const endTime2 = new Date();
-		  const timeTaken2 = endTime2 - startTime;
+      const timeTaken2 = endTime2 - startTime;
       console.log('First Time taken (ms):', timeTaken2);
       //----------------------------------------
       console.log('log', receipt.logs);
@@ -381,14 +331,14 @@ try {
       const jsonlog = JSON.stringify(serializelog);
       console.log("This is JSONstringfy: ",jsonlog);
       response(response_type.RECEIPT, method + "_%%_" + JSON.stringify(serializelog));
-		  return receipt;
-		} catch (error) {
-		  console.error('Error sending transaction:', error);
+      return receipt;
+    } catch (error) {
+      console.error('Error sending transaction:', error);
       response(response_type.ERROR, method + "_%%_" + error.message);
       //throw error; // rethrow the error to handle it at a higher level
+    }
+  }  
 }
-		}
-	  }
 	  
 
 //------------------------------------------------------Assisting Decoding function--------------------
@@ -528,7 +478,7 @@ const fantomChain = {
 };
 */
 async function switchToFantom() {
-const hexValue = "0x" + MasterChainID.toString(16);
+  const hexValue = "0x" + MasterChainID.toString(16);
   try{
     await window.ethereum.request({
     method: 'wallet_switchEthereumChain',
@@ -547,19 +497,20 @@ const hexValue = "0x" + MasterChainID.toString(16);
       // Optionally display a generic error message for other unexpected errors
     }
   }
-}
+ }
 
 // Call the connectToFantom function to connect to the Fantom chain
 //connectToFantom();
-setTimeout(switchToFantom, 1000);
 
-//Resize Canvas
-document.addEventListener("DOMContentLoaded", function() {
-  
-  // Add click event listener to the button
-  document.getElementById("unity-rotate-button").addEventListener("click", rotateCanvas);
-  console.log("resizeclicked");
 
+// Get a reference to the button element
+const rotateButton = document.getElementById("unity-rotate-button");
+
+// Add a click event listener to the button
+rotateButton.addEventListener("click", function() {
+  // Call the rotateCanvas function here
+  rotateCanvas();
+  console.log("Rotated"); // Optional for debugging
 });
 
 var isHorizontal = true;

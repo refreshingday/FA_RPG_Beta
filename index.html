@@ -7,7 +7,7 @@
     <title>Fate-Adventure-BETAPVP1</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-
+    <script  src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.2/ethers.umd.js"></script>
   </head>
   <style>
       /* Set the background color to red */
@@ -21,10 +21,8 @@
     </style>
   <!--<body style="background-image: url('https://assets.zyrosite.com/mxBlyJk3v4f0qnxK/jojo-art-YX4XO87g1KtqLDE8.jpg');">--> 
     <body style="background-color: #000000d9;"></body>
-
-    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.2/ethers.umd.js"></script>
-    <!-- <script type="text/javascript" src="./reroute.js"></script>   -->
-    <script type="text/javascript" src="./index.js"></script>  
+    
+     
     <script>
       function clearCache() {
         o = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -49,9 +47,13 @@
       <div id="unity-warning"></div>
       <!--<div id="unity-footer">
         <div id="unity-webgl-logo"></div>-->
-        <div id="unity-rotate-button"></div>
-        <div id="unity-build-title" style="color:beige">Rotate Screen</div>
-        <div style="font-family: 'Arial Black', sans-serif; font-size: 28px; color: #010b16; text-shadow: 2px 2px 4px #15669b;user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;">FATE ADVENTURE RPG - BETA - V1.0 </div>
+        <div id="unity-rotate-button" style="display:none;"></div>
+        <div id="unity-build-title" style="display:none; color:beige">Rotate Screen</div>
+        <div style="font-family: 'Arial Black', sans-serif; font-size: 22px; color: #010b16; text-shadow: 2px 2px 4px #15669b;
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none">PVP BETA 1 - DOES NOT REPRESENT FINAL PRODUCT. </div>
       </div>
     </div>
     <script>
@@ -60,19 +62,19 @@
         type: "text/javascript",
         src: "./network.js"
       }));*/
-      // #####################################################################################################################    
+      // #####################################################################################################################   PVP Beta (3rd Format) (This version is not final) 
       var initwidth = window.innerWidth;
       //// var pixelRatio = window.devicePixelRatio || 1;
       var mainDiv = document.getElementById('unity-container');
-      //  mainDiv.style.width = 1280 / pixelRatio + 'px';
-      // mainDiv.style.height = 720 / pixelRatio + 'px';
+      //  mainDiv.style.width = 960 / pixelRatio + 'px';
+      // mainDiv.style.height = 540 / pixelRatio + 'px';
       var pixelRatio = window.devicePixelRatio || 1;
       var mainCanvas = document.getElementById('unity-canvas');
-      mainCanvas.style.width = 1 / pixelRatio + 'px';
-      mainCanvas.style.height = 1 / pixelRatio + 'px';
+      mainCanvas.style.width = 1280 + 'px';
+      mainCanvas.style.height = 720 + 'px';
 
-      function resize() {
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+  /*    function resize() {
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {*/
           /*
           mainCanvas.style.position = "absolute";
           mainCanvas.style.top = "50%";
@@ -83,19 +85,15 @@
           //   if (document.body.offsetWidth >= 1280 || true) {
           //     document.getElementById("main").style.textAlign = "center";
           //   } else {
-          document.getElementById("unity-container").style.textAlign = "center";
+          //document.getElementById("unity-container").style.textAlign = "center";
 
-          var fullscreenButton = document.getElementById("unity-fullscreen-button");
-          fullscreenButton.style.display = "none";
-
-          var buildTitle = document.getElementById("unity-build-title");
-          buildTitle.style.display = "none";
+          
 
           //    mainCanvas.style.position = "relative";
           //    mainCanvas.style.left = Math.abs(((1280 - document.body.offsetWidth)/4)) + 'px';
           //    mainCanvas.style.left = 70 + 'px';
           //  }
-          const minCanvasWidth = 1280 / pixelRatio;
+ /*         const minCanvasWidth = 1280 / pixelRatio;
           const maxCanvasWidth = 1280 / pixelRatio;
           const minCanvasHeight = 720 / pixelRatio;
           const maxCanvasHeight = 720 / pixelRatio;
@@ -116,10 +114,11 @@
           }
           // Set the new width and height of the canvas
           //body.style.width = 1280/ pixelRatio+'px';
-          mainCanvas.style.width = 1280 / pixelRatio + 'px';
+ /*         mainCanvas.style.width = 1280 / pixelRatio + 'px';
           mainCanvas.style.height = 720 / pixelRatio + 'px';
-          document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=' + 1280 / pixelRatio + 'px, initial-scale=' + 1);
-          document.body.style.zoom = (1280 / pixelRatio) / window.innerWidth * 100 + "%";
+          //document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=' + 1280 / pixelRatio + 'px, initial-scale=' + 1);
+          document.body.style.zoom = 1280  / window.innerWidth * 100 + "%";
+          //document.body.style.zoom = (1280 / pixelRatio) / window.innerWidth * 100 + "%";
           if (document.getElementById("unity-container").clientHeight < window.innerHeight) {
             var Heightoffset = (window.innerHeight - document.getElementById("unity-container").clientHeight) / 2;
           } else {
@@ -131,9 +130,9 @@
           //myDiv.textContent = "openALPHA - expect bugs.";
           //myDiv.style.height = Heightoffset + 'px';
           //remove fullscreen mode for Mobile since the size will be wrong.
-          
-        } else {
-var rotateButton = document.getElementById("unity-rotate-button");
+          */
+   /*     } else { 
+          var rotateButton = document.getElementById("unity-rotate-button");
           rotateButton.style.display = "none";
 
           var buildTitle = document.getElementById("unity-build-title");
@@ -175,9 +174,12 @@ var rotateButton = document.getElementById("unity-rotate-button");
           //myDiv.style.height = Heightoffset + 'px';
         }
       }
-      resize();
+      resize();*/
       //###########################################################################################################################
     </script>
+    <!-- js here to prevent race condition -->
+    
+    <script  src="./index.js"></script> 
     <script>
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
@@ -191,6 +193,12 @@ var rotateButton = document.getElementById("unity-rotate-button");
       // Modify or remove this function to customize the visually presented
       // way that non-critical warnings and error messages are presented to the
       // user.
+      function displayROTATE() {
+        var rotatebutton = document.querySelector("#unity-rotate-button");
+          var buildtitle = document.querySelector("#unity-build-title");
+          rotatebutton.style.display = "block";
+          buildtitle.style.display = "block";
+      }
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
           warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
@@ -249,6 +257,8 @@ var rotateButton = document.getElementById("unity-rotate-button");
           /*fullscreenButton.onclick = () => {
             unityInstance.SetFullscreen(1);
           };*/
+          setTimeout(switchToFantom, 3127);
+          setTimeout(displayROTATE, 4123);
         }).catch((message) => {
           alert(message);
         });
@@ -292,6 +302,9 @@ var rotateButton = document.getElementById("unity-rotate-button");
     console.log('zzzAggressive gas price:', zzz);
  */ 
   </script>
+
+
+
 
 
   </body>

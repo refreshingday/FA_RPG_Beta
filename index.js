@@ -30,7 +30,7 @@ const response_type = {
 
 // const web3 = new Web3(Web3.givenProvider) ;
 // const from = await web3.eth.getAccounts();
-
+/* ORIGINAL CONNECT WALLET WEB3 
 async function ConnectWallet(){
   console.log("ConnectWallet()");
 
@@ -89,6 +89,102 @@ async function ConnectWallet(){
   response(response_type.ACCOUNT_NUMBER, userAccountNEW);
 }
 
+*/
+
+
+
+
+
+//################################### AA ####################################
+/*const button = document.createElement('button');
+button.textContent = 'Click me'; // Set the button text
+
+// Add an event listener to the button
+button.addEventListener('click', () => {
+    // Call the AA() function when the button is clicked
+    AA();
+});
+
+// Append the button to the document body
+document.body.appendChild(button);
+*/
+
+/*const wallet = ethers.Wallet.createRandom();
+
+console.log("Address:", wallet.address);
+console.log("Private Key:", wallet.privateKey);
+console.log("Mnemonic:", wallet.mnemonic.phrase);*/
+// Step 1: Define your RPC URL and Chain ID
+const AA_rpcUrl = 'https://rpc.testnet.soniclabs.com';
+const AA_chainId = 64165;
+
+// Step 2: Define the provider with the custom RPC
+const AA_provider = new ethers.JsonRpcProvider(AA_rpcUrl, {
+  name: 'soniclabs-testnet',
+  chainId: AA_chainId,
+});
+console.log(AA_provider);
+// Step 3: Create or restore a wallet
+// If you want to create a new wallet, uncomment the following line
+// const AA_wallet = ethers.Wallet.createRandom();
+
+// If you want to use an existing wallet with a private key:
+const AA_privateKey = '0xbec809822ba49af479831ae939f98280b5e8fd5c0d737099d484b447c94f5055';
+const AA_wallet = new ethers.Wallet(AA_privateKey, AA_provider);
+
+// Step 4: Define the recipient address and amount to send
+const AA_recipient = '0x879CbB5C20506671F22D9085BC09b11b14E5Fa01'; // Replace with recipient address
+const AA_amountInEther = '0.01'; // Amount to send in Ether (or the network's native token)
+
+
+
+
+
+async function ConnectWallet(){
+  console.log("ConnectWallet() AA integrated");
+  // Connect to the MetaMask EIP-1193 object. This is a standard
+    // protocol that allows Ethers access to make all read-only
+    // requests through MetaMask.
+    providerNEW = AA_provider;
+    console.log(providerNEW);
+    const network = await providerNEW.getNetwork();
+    console.log("network:", network);
+    var chainId = network.chainId;
+    // Convert chainId to a number before comparison
+    chainId = parseInt(chainId, 10);
+    console.log("Chain ID:", chainId);
+
+    // Check if chain ID is not 250
+    if (chainId !== MasterChainID) {
+      switchToFantom();
+      alert("Switch to Fantom Network before Connecting."); // Display alert pop-up
+      return;
+    }
+    // It also provides an opportunity to request access to write
+    // operations, which will be performed by the private key
+    // that MetaMask manages for the user.
+   // signerNEW = await providerNEW.getSigner();
+  
+
+  /*try {
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+  } catch (error) {
+    if (error.code === 4001) {
+      window.location.href = 'ethereum:';
+    } else {
+      console.log(error);
+    }
+  }*/
+  userAccountNEW = AA_recipient;
+
+  console.log(userAccountNEW);
+
+  console.log("ConnectWallet() getweb3 done");
+
+  response(response_type.ACCOUNT_NUMBER, userAccountNEW);
+}
+
+//################################ AA END  #################################
 
 import("./reroute.js")
 // walkaround();
@@ -256,7 +352,8 @@ async function readContract(id, method, abi, contract, args) {
   });
 }
 //---------------------------------- SEND --------------------------------------------------------------------------------
-async function sendContract(id, method, abi, contract, args, value, gasLimit, gasPrice) {
+async function sendContract2(id, method, abi, contract, args, value, gasLimit, gasPrice) {
+  console.log("SEND CONTRACTTTT");
   // Get network object
   providerNEW = new ethers.BrowserProvider(window.ethereum);
   const network = await providerNEW.getNetwork();
@@ -273,6 +370,91 @@ async function sendContract(id, method, abi, contract, args, value, gasLimit, ga
     //const from = (await web3.eth.getAccounts())[0];
     const contracts = new ethers.Contract(contract, abi, providerNEW);
     const contractWithSigner = contracts.connect(signerNEW);
+    
+    var options = {};
+    if (gasLimit != "") { options.gasLimit = gasLimit; }
+    if (gasPrice != "") { options.gasPrice = gasPrice; }
+    if (value    != "") { options.value    = value; }
+
+    console.log("waiting metamask");
+    
+    //console.log(from)
+    console.log(id)
+    console.log(contract)
+    console.log(method)
+    console.log(args)
+    console.log(options);
+    console.log(value)
+    console.log(gasLimit)
+    console.log(gasPrice)
+    
+    try {
+      console.log("HERE123");
+      console.log(...JSON.parse(args));
+      const transaction = await contractWithSigner[method](...JSON.parse(args), options);
+      console.log("HERE321");
+      const startTime = new Date();
+      // Wait for the transaction to be mined and get receipt
+      console.log(transaction.hash);
+      response(response_type.HASH, method);
+      const receipt = await getTransactionReceiptWithRetry(transaction.hash, 120);
+      console.log("USE OTHER METHOD",receipt )
+      const endTime2 = new Date();
+      const timeTaken2 = endTime2 - startTime;
+      console.log('First Time taken (ms):', timeTaken2);
+      //----------------------------------------
+      console.log('log', receipt.logs);
+      const parsedLogs = [];
+      for (const log of receipt.logs) {
+        const parsedLog = contracts.interface.parseLog(log);
+        
+        if (parsedLog) {
+          parsedLogs.push(parsedLog);
+        } else {
+          parsedLogs.push(log);
+        }
+      }
+      console.log("this is parsed log: ", parsedLogs);
+      // Now parsedLogs contains the parsed logs and raw logs if they didn't match the ABI
+      
+
+      const unwraplog = unwrapProxy(parsedLogs);
+      console.log("Unwrapped proxy: ",unwraplog);
+
+      
+      const serializelog = convertBigIntsToStrings(unwraplog);
+      console.log("serialize log: ",serializelog);
+
+      const jsonlog = JSON.stringify(serializelog);
+      console.log("This is JSONstringfy: ",jsonlog);
+      response(response_type.RECEIPT, method + "_%%_" + JSON.stringify(serializelog));
+      return receipt;
+    } catch (error) {
+      console.error('Error sending transaction:', error);
+      response(response_type.ERROR, method + "_%%_" + error.message);
+      //throw error; // rethrow the error to handle it at a higher level
+    }
+  }  
+}
+//############## AA SEND CONTRACT ###################
+async function sendContract(id, method, abi, contract, args, value, gasLimit, gasPrice) {
+  console.log("SEND CONTRACTTTT");
+  // Get network object
+  providerNEW = AA_provider ;
+  const network = await providerNEW.getNetwork();
+  var chainId = network.chainId;
+  // Convert chainId to a number before comparison
+  chainId = parseInt(chainId, 10);
+  console.log("Chain ID:", chainId);
+
+  // Check if chain ID is not 250
+  if (chainId !== MasterChainID) {
+    switchToFantom();
+    response(response_type.ERROR, method + "_%%_" + "wrong RPC, switch to Fantom Network and Retry.");
+  } else { 
+    //const from = (await web3.eth.getAccounts())[0];
+    const contracts = new ethers.Contract(contract, abi, providerNEW);
+    const contractWithSigner = contracts.connect(AA_wallet);
     
     var options = {};
     if (gasLimit != "") { options.gasLimit = gasLimit; }

@@ -22,6 +22,7 @@
   <!--<body style="background-image: url('https://assets.zyrosite.com/mxBlyJk3v4f0qnxK/jojo-art-YX4XO87g1KtqLDE8.jpg');">--> 
     <body style="background-color: #000000d9;"></body>
     
+    
      
     <script>
       function clearCache() {
@@ -49,11 +50,11 @@
         <div id="unity-webgl-logo"></div>-->
         <div id="unity-rotate-button" style="display:none;"></div>
         <div id="unity-build-title" style="display:none; color:beige">Rotate Screen</div>
-        <div style="font-family: 'Arial Black', sans-serif; font-size: 22px; color: #010b16; text-shadow: 2px 2px 4px #15669b;
+        <!--div style="font-family: 'Arial Black', sans-serif; font-size: 22px; color: #010b16; text-shadow: 2px 2px 4px #15669b;
         user-select: none;
         -moz-user-select: none;
         -webkit-user-select: none;
-        -ms-user-select: none">PVP BETA 1 - DOES NOT REPRESENT FINAL PRODUCT. </div>
+        -ms-user-select: none">PVP BETA 1 - DOES NOT REPRESENT FINAL PRODUCT. </div-->
       </div>
     </div>
     <script>
@@ -63,7 +64,38 @@
         src: "./network.js"
       }));*/
       // #####################################################################################################################   PVP Beta (3rd Format) (This version is not final) 
-      var initwidth = window.innerWidth;
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var warningBanner = document.querySelector("#unity-warning");
+      const ASPECT_RATIO = 16 / 9;
+
+      function resizeCanvas() {
+          var windowWidth = window.innerWidth;
+          var windowHeight = window.innerHeight;
+          var windowRatio = windowWidth / windowHeight;
+
+          var newWidth, newHeight;
+
+          if (windowRatio > ASPECT_RATIO) {
+              // Window is wider than the target aspect ratio
+              newHeight = windowHeight;
+              newWidth = newHeight * ASPECT_RATIO;
+          } else {
+              // Window is taller than the target aspect ratio
+              newWidth = windowWidth;
+              newHeight = newWidth / ASPECT_RATIO;
+          }
+
+          canvas.style.width = newWidth + 'px';
+          canvas.style.height = newHeight + 'px';
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas(); // Call once to set initial size
+
+
+      /*      var initwidth = window.innerWidth;
       //// var pixelRatio = window.devicePixelRatio || 1;
       var mainDiv = document.getElementById('unity-container');
       //  mainDiv.style.width = 960 / pixelRatio + 'px';
@@ -71,7 +103,7 @@
       var pixelRatio = window.devicePixelRatio || 1;
       var mainCanvas = document.getElementById('unity-canvas');
       mainCanvas.style.width = 1280 + 'px';
-      mainCanvas.style.height = 720 + 'px';
+      mainCanvas.style.height = 720 + 'px'; */
 
   /*    function resize() {
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {*/
@@ -193,12 +225,13 @@
       // Modify or remove this function to customize the visually presented
       // way that non-critical warnings and error messages are presented to the
       // user.
-      function displayROTATE() {
+ /*     function displayROTATE() {
         var rotatebutton = document.querySelector("#unity-rotate-button");
           var buildtitle = document.querySelector("#unity-build-title");
           rotatebutton.style.display = "block";
           buildtitle.style.display = "block";
-      }
+      }*/
+
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
           warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
@@ -258,7 +291,7 @@
             unityInstance.SetFullscreen(1);
           };*/
           setTimeout(switchToFantom, 3127);
-          setTimeout(displayROTATE, 4123);
+/*          setTimeout(displayROTATE, 4123);*/
         }).catch((message) => {
           alert(message);
         });

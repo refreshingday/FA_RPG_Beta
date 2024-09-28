@@ -96,24 +96,31 @@ async function ConnectWallet(){
 
 
 //################################### AA ####################################
-/*const button = document.createElement('button');
-button.textContent = 'Click me'; // Set the button text
+/**/
+const button1 = document.createElement('button');
+button1.textContent = 'create wallet'; // Set the button text
 
 // Add an event listener to the button
-button.addEventListener('click', () => {
+button1.addEventListener('click', () => {
     // Call the AA() function when the button is clicked
-    AA();
+    CreateWallet();
 });
 
 // Append the button to the document body
-document.body.appendChild(button);
-*/
+document.body.appendChild(button1);
 
-/*const wallet = ethers.Wallet.createRandom();
 
-console.log("Address:", wallet.address);
-console.log("Private Key:", wallet.privateKey);
-console.log("Mnemonic:", wallet.mnemonic.phrase);*/
+/**/
+function CreateWallet(){
+  const wallet = ethers.Wallet.createRandom();
+  AA_privateKey = wallet.privateKey;
+  AA_recipient = wallet.address;
+  console.log("Address:", wallet.address);
+  console.log("Private Key:", wallet.privateKey);
+  console.log("Mnemonic:", wallet.mnemonic.phrase);
+}
+
+
 // Step 1: Define your RPC URL and Chain ID
 const AA_rpcUrl = 'https://rpc.testnet.soniclabs.com';
 const AA_chainId = 64165;
@@ -129,18 +136,25 @@ console.log(AA_provider);
 // const AA_wallet = ethers.Wallet.createRandom();
 
 // If you want to use an existing wallet with a private key:
-const AA_privateKey = '0xbec809822ba49af479831ae939f98280b5e8fd5c0d737099d484b447c94f5055';
+//const AA_privateKey = '0xbec809822ba49af479831ae939f98280b5e8fd5c0d737099d484b447c94f5055';
+//const AA_recipient = '0x879CbB5C20506671F22D9085BC09b11b14E5Fa01'; // Replace with recipient address
+
+//const AA_privateKey = '0x9bd104d9735138271e084ae34c596bd82ff40bc5ac637b998bb81efb0e79294d';
+//const AA_recipient = '0xd1F555ba3b88A8eA0Cc0066119eFb47d98E32Ff7'; // Replace with recipient address
+
+//const AA_privateKey = '0x30b2b4b604ddd7d15162575ba83edc507e79eaf1d48d9f79dfa7067545728ef8';
+//const AA_recipient = '0xF131E9fCb2A9497e89B469271b873a3c06617793'; // Replace with recipient address
+var AA_privateKey;
+var AA_recipient;
 const AA_wallet = new ethers.Wallet(AA_privateKey, AA_provider);
 
-// Step 4: Define the recipient address and amount to send
-const AA_recipient = '0x879CbB5C20506671F22D9085BC09b11b14E5Fa01'; // Replace with recipient address
 const AA_amountInEther = '0.01'; // Amount to send in Ether (or the network's native token)
 
 
 
 
-
-async function ConnectWallet(){
+//########THIS IS AA VERSION,  there is another web3 version of ConnectWallet
+async function ConnectWalletAA(){ //this is connecting newly created wallet. BUT need to transfer gas to it...
   console.log("ConnectWallet() AA integrated");
   // Connect to the MetaMask EIP-1193 object. This is a standard
     // protocol that allows Ethers access to make all read-only
@@ -352,7 +366,7 @@ async function readContract(id, method, abi, contract, args) {
   });
 }
 //---------------------------------- SEND --------------------------------------------------------------------------------
-async function sendContract2(id, method, abi, contract, args, value, gasLimit, gasPrice) {
+async function sendContract(id, method, abi, contract, args, value, gasLimit, gasPrice) { //conventional web3 wallet send
   console.log("SEND CONTRACTTTT");
   // Get network object
   providerNEW = new ethers.BrowserProvider(window.ethereum);
@@ -437,7 +451,7 @@ async function sendContract2(id, method, abi, contract, args, value, gasLimit, g
   }  
 }
 //############## AA SEND CONTRACT ###################
-async function sendContract(id, method, abi, contract, args, value, gasLimit, gasPrice) {
+async function sendContractAA(id, method, abi, contract, args, value, gasLimit, gasPrice) { //for going with AA way, call this instead.
   console.log("SEND CONTRACTTTT");
   // Get network object
   providerNEW = AA_provider ;

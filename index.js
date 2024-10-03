@@ -113,7 +113,7 @@ button1.textContent = 'New account'; // Set the button text
 button1.addEventListener('click', () => {
     // Call the AA() function when the button is clicked
     //CreateAndConnectWeb2Wallet(1);
-    getSBalance(1);
+    CreateWeb2Wallet(1);
 });
 
 // Append the button to the document body
@@ -303,9 +303,6 @@ async function ConnectAAWallet(aawalletaddress, aakey){
 
   AAornot = true;
   response(response_type.ACCOUNT_NUMBER, AA_recipient);
-  response(response_type.WALLET, AA_recipient);
-  response(response_type.KEY, AA_privateKey);
-  response(response_type.RECOVERY, wallet.mnemonic.phrase);
   AAornot = true;
 
 }

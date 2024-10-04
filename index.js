@@ -107,7 +107,7 @@ async function ConnectWallet(){
 //################################### AA ####################################
 /**/
 const button1 = document.createElement('button');
-button1.textContent = 'New account'; // Set the button text
+button1.textContent = '111'; // Set the button text
 
 // Add an event listener to the button
 button1.addEventListener('click', () => {

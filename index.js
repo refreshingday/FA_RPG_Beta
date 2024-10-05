@@ -95,6 +95,7 @@ async function ConnectWallet(){
 
   AAornot = false;
   GLOBALWALLETADDRESS = userAccountNEW;
+  sendBalanceinfo();
   response(response_type.ACCOUNT_NUMBER, userAccountNEW);
   
 }
@@ -170,7 +171,7 @@ async function getSBalance(walletAddress) {
   response(response_type.BALANCE, balanceInEth);
 }
 
-async function periodicGetBalance() {
+async function sendBalanceinfo() {
   try {
     // Check if GLOBALWALLETADDRESS is defined and not empty
     if (!GLOBALWALLETADDRESS) {
@@ -192,7 +193,7 @@ async function periodicGetBalance() {
   }
 }
 // Run the function every 21 seconds (21000 ms)
-setInterval(periodicGetBalance, 21000);
+setInterval(sendBalanceinfo, 21000);
 
 
 
@@ -286,6 +287,7 @@ async function CreateAndConnectWeb2Wallet(fkey,pass){
 
   AAornot = true;
   GLOBALWALLETADDRESS = AA_recipient;
+  sendBalanceinfo();
   response(response_type.ACCOUNT_NUMBER, AA_recipient);
   response(response_type.WALLET, AA_recipient);
   response(response_type.KEY, AA_privateKey);
@@ -336,6 +338,7 @@ async function ConnectAAWallet(aawalletaddress, aakey){
 
   AAornot = true;
   GLOBALWALLETADDRESS = AA_recipient;
+  sendBalanceinfo();
   response(response_type.ACCOUNT_NUMBER, AA_recipient);
   AAornot = true;
 
@@ -641,14 +644,7 @@ async function sendContract(id, method, abi, contract, args, value, gasLimit, ga
         //throw error; // rethrow the error to handle it at a higher level
       }
     }  
-    //------------response balance after send contract --------------
-    const balanceInWei = await AA_provider.getBalance(GLOBALWALLETADDRESS);
-    const balanceInEth = ethers.formatEther(balanceInWei);
-
-    // Log and respond with the balance
-    console.log(balanceInEth);
-    response(response_type.BALANCE, balanceInEth);
-    //---------------------------------------------------------------
+    sendBalanceinfo();
   } else { //////////////  AA is TRUE   ///////////////////////////////////////////////
     console.log("SEND AA CONTRACTTTT");
     // Get network object
@@ -731,14 +727,7 @@ async function sendContract(id, method, abi, contract, args, value, gasLimit, ga
         response(response_type.ERROR, method + "_%%_" + error.message);
         //throw error; // rethrow the error to handle it at a higher level
       }
-      //------------response balance after send contract --------------
-      const balanceInWei = await AA_provider.getBalance(GLOBALWALLETADDRESS);
-      const balanceInEth = ethers.formatEther(balanceInWei);
-
-      // Log and respond with the balance
-      console.log(balanceInEth);
-      response(response_type.BALANCE, balanceInEth);
-      //---------------------------------------------------------------
+      sendBalanceinfo();
     }  
   }
 }

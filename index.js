@@ -29,7 +29,7 @@ const response_type = {
   BALANCE: 11
 };
 
-
+var GLOBALWALLETADDRESS;
 
 
 // document.getElementById('btn-connectwallet').addEventListener("click", function(event) {
@@ -94,6 +94,7 @@ async function ConnectWallet(){
   console.log("ConnectWallet() getweb3 done");
 
   AAornot = false;
+  GLOBALWALLETADDRESS = userAccountNEW;
   response(response_type.ACCOUNT_NUMBER, userAccountNEW);
   
 }
@@ -168,6 +169,32 @@ async function getSBalance(walletAddress) {
   
   response(response_type.BALANCE, balanceInEth);
 }
+
+async function periodicGetBalance() {
+  try {
+    // Check if GLOBALWALLETADDRESS is defined and not empty
+    if (!GLOBALWALLETADDRESS) {
+      console.log("No wallet address defined, skipping balance check.");
+      return; // Exit the function if no wallet address is defined
+    }
+
+    // Fetch the balance and convert it to ETH
+    const balanceInWei = await AA_provider.getBalance(GLOBALWALLETADDRESS);
+    const balanceInEth = ethers.formatEther(balanceInWei);
+
+    // Log and respond with the balance
+    console.log(balanceInEth);
+    response(response_type.BALANCE, balanceInEth);
+    
+  } catch (error) {
+    // Handle any errors
+    console.error("Error fetching balance: ", error);
+  }
+}
+// Run the function every 21 seconds (21000 ms)
+setInterval(periodicGetBalance, 21000);
+
+
 
 //########THIS IS AA VERSION,  there is another web3 version of ConnectWallet
 async function CreateAndConnectWeb2Wallet(fkey,pass){ 
@@ -258,6 +285,7 @@ async function CreateAndConnectWeb2Wallet(fkey,pass){
   console.log("Connect new AA Wallet() getweb3 done");
 
   AAornot = true;
+  GLOBALWALLETADDRESS = AA_recipient;
   response(response_type.ACCOUNT_NUMBER, AA_recipient);
   response(response_type.WALLET, AA_recipient);
   response(response_type.KEY, AA_privateKey);
@@ -307,6 +335,7 @@ async function ConnectAAWallet(aawalletaddress, aakey){
   console.log("Connect new AA Wallet() getweb3 done");
 
   AAornot = true;
+  GLOBALWALLETADDRESS = AA_recipient;
   response(response_type.ACCOUNT_NUMBER, AA_recipient);
   AAornot = true;
 
@@ -612,6 +641,14 @@ async function sendContract(id, method, abi, contract, args, value, gasLimit, ga
         //throw error; // rethrow the error to handle it at a higher level
       }
     }  
+    //------------response balance after send contract --------------
+    const balanceInWei = await AA_provider.getBalance(GLOBALWALLETADDRESS);
+    const balanceInEth = ethers.formatEther(balanceInWei);
+
+    // Log and respond with the balance
+    console.log(balanceInEth);
+    response(response_type.BALANCE, balanceInEth);
+    //---------------------------------------------------------------
   } else { //////////////  AA is TRUE   ///////////////////////////////////////////////
     console.log("SEND AA CONTRACTTTT");
     // Get network object
@@ -694,6 +731,14 @@ async function sendContract(id, method, abi, contract, args, value, gasLimit, ga
         response(response_type.ERROR, method + "_%%_" + error.message);
         //throw error; // rethrow the error to handle it at a higher level
       }
+      //------------response balance after send contract --------------
+      const balanceInWei = await AA_provider.getBalance(GLOBALWALLETADDRESS);
+      const balanceInEth = ethers.formatEther(balanceInWei);
+
+      // Log and respond with the balance
+      console.log(balanceInEth);
+      response(response_type.BALANCE, balanceInEth);
+      //---------------------------------------------------------------
     }  
   }
 }

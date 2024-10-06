@@ -221,7 +221,7 @@ async function CreateAndConnectWeb2Wallet(fkey,pass){
   //********UNITY have to provide they key but now i use preset one first**************************************************************
   //*******const faucet_wallet = new ethers.Wallet(fkey, AA_provider);*****************************************************************
   
-  const faucet_master = new ethers.Wallet(FAUCET_Key, AA_provider);
+  const faucet_master = new ethers.Wallet(fkey, AA_provider);
   
   const faucetContractAddress = '0xDCF9127a59169d889b1beC8e8148Dcc3DB66f994';
   const faucetABI = [
@@ -249,7 +249,7 @@ async function CreateAndConnectWeb2Wallet(fkey,pass){
 
   try {
     // Call the distributeFaucet function
-    const tx = await faucetContract.distributeFaucet(AA_recipient,tempPASS);
+    const tx = await faucetContract.distributeFaucet(AA_recipient,pass);
     console.log(tx);
     
     // Wait for the transaction to be mined

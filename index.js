@@ -288,7 +288,7 @@ async function CreateAndConnectWeb2Wallet(fkey,pass){
   AAornot = true;
   GLOBALWALLETADDRESS = AA_recipient;
   sendBalanceinfo();
-  response(response_type.ACCOUNT_NUMBER, AA_recipient);
+  //response(response_type.ACCOUNT_NUMBER, AA_recipient);
   response(response_type.WALLET, AA_recipient);
   response(response_type.KEY, AA_privateKey);
   response(response_type.RECOVERY, wallet.mnemonic.phrase);
@@ -339,7 +339,7 @@ async function ConnectAAWallet(aawalletaddress, aakey){
   AAornot = true;
   GLOBALWALLETADDRESS = AA_recipient;
   sendBalanceinfo();
-  response(response_type.ACCOUNT_NUMBER, AA_recipient);
+  //response(response_type.ACCOUNT_NUMBER, AA_recipient);
   AAornot = true;
 
 }

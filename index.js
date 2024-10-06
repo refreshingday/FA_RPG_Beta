@@ -26,7 +26,8 @@ const response_type = {
   WALLET: 8,
   KEY: 9,
   RECOVERY: 10,
-  BALANCE: 11
+  BALANCE: 11,
+  AA_CONNECTED: 12
 };
 
 var GLOBALWALLETADDRESS;
@@ -339,7 +340,7 @@ async function ConnectAAWallet(aawalletaddress, aakey){
   AAornot = true;
   GLOBALWALLETADDRESS = AA_recipient;
   sendBalanceinfo();
-  //response(response_type.ACCOUNT_NUMBER, AA_recipient);
+  response(response_type.AA_CONNECTED, AA_recipient);
   AAornot = true;
 
 }

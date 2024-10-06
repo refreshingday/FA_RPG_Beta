@@ -12,7 +12,8 @@ const MasterChainID = 64165; //250 is Fantom Mainnet, 64165
   FULL_SCREEN: 3,
   NEW_ACCOUNT: 4,
   CONNECT_AA: 5,
-  GET_BALANCE: 6
+  GET_BALANCE: 6,
+  INSTALL_PROMPT: 7
 };
 
 const response_type = {
@@ -447,6 +448,11 @@ function JsCallFunction(type, arg_string){
       // get S balance to display
 
     }
+  }
+  else if (type == call_type.INSTALL_PROMPT){
+    
+      hideCanvasAndShowPrompt();
+      //install prompt
   }
 
 
@@ -1003,3 +1009,77 @@ function rotateCanvas() {
   
   response(response_type.ROTATE, isHorizontal);
 }
+
+//---------------Install Prompt -------------------------
+/*window.addEventListener('load', () => {
+  setTimeout(() => {
+    console.log("show install prompt next")
+    hideCanvasAndShowPrompt(); // Call the function to show the install prompt
+  }, 5000); // 5000 milliseconds = 5 seconds
+});
+*/
+
+
+// Function to create a button and append it to the body
+function createInstallButton() {
+  // Create a new button element
+  const button = document.createElement('button');
+
+  // Set button text
+  button.innerText = 'Install';
+
+  // Add a click event listener to the button that calls showInstallPrompt
+  //canvas.style.display = 'none'; // Hide the canvas
+  button.addEventListener('click', hideCanvasAndShowPrompt);
+
+  // Append the button to the body (or any other desired container)
+  document.body.appendChild(button);
+}
+
+// Call the function to create and display the install button
+createInstallButton();
+
+// Function to hide the canvas and show the modal with install prompt
+function hideCanvasAndShowPrompt() {
+  //const canvas = document.getElementById('yourCanvasId'); // Replace with your canvas ID
+  canvas.style.display = 'none'; // Hide the canvas
+
+  // Create a modal div
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.top = '50%';
+  modal.style.left = '50%';
+  modal.style.transform = 'translate(-50%, -50%)';
+  modal.style.padding = '20px';
+  modal.style.backgroundColor = '#fff';
+  modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+  modal.style.zIndex = '1000';
+
+  // Create text message
+  const message = document.createElement('p');
+  message.innerText = 'Do you want to install the Fate Adventure WebAPP?';
+  modal.appendChild(message);
+
+  // Create Yes button
+  const yesButton = document.createElement('button');
+  yesButton.innerText = 'Yes';
+  yesButton.onclick = () => {
+      // Call the install prompt function here
+      showInstallPrompt();
+      document.body.removeChild(modal); // Remove the modal
+  };
+  modal.appendChild(yesButton);
+
+  // Create No button
+  const noButton = document.createElement('button');
+  noButton.innerText = 'No';
+  noButton.onclick = () => {
+      document.body.removeChild(modal); // Remove the modal
+      canvas.style.display = 'block';
+  };
+  modal.appendChild(noButton);
+
+  // Append the modal to the body
+  document.body.appendChild(modal);
+}
+

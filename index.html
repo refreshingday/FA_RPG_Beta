@@ -8,10 +8,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="TemplateData/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="TemplateData/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="TemplateData/favicon-16x16.png">
-    <link rel="manifest" href="TemplateData/site.webmanifest">
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="TemplateData/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.2/ethers.umd.js"></script>
-    
+
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#000000">
   </head>
@@ -28,23 +28,11 @@
   <!--<body style="background-image: url('https://assets.zyrosite.com/mxBlyJk3v4f0qnxK/jojo-art-YX4XO87g1KtqLDE8.jpg');">--> 
     <!--body style="background-color: #000000d9;"></body-->
     <body style="background-color: #000000;"></body>
+ 
+
+
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-              console.log('Service Worker registered successfully:', registration.scope);
-            })
-            .catch(error => {
-              console.log('Service Worker registration failed:', error);
-            });
-        });
-      }
-    </script>
-    
-     
-    <script>
-      
+
       function clearCache() {
         o = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
         var t = {
@@ -57,7 +45,7 @@
       }
     </script>
     <div id="unity-container" class="unity-desktop">
-           
+
       <canvas id="unity-canvas" width=1280 height=720 ></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -113,6 +101,8 @@
       }
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas(); // Call once to set initial size
+      // Call resizeCanvas again after 2 seconds
+      setTimeout(resizeCanvas, 2000);
 
       //###########################################################################################################################
       //###########################################################################################################################
@@ -189,7 +179,7 @@
             loadingBar.style.display = "none";
             setTimeout(switchToFantom, 3127);
             console.log("poppop1");
-            showInstallPrompt(); // Add this line to show the install prompt
+            //showInstallPrompt(); // Add this line to show the install prompt
             console.log("poppop2");
           }).catch((message) => {
             alert(message);
@@ -197,30 +187,26 @@
       };
       document.body.appendChild(script);
     </script>
-    
+
     <script>
       console.log('gashere');
       // Connect to the Web3 provider
       //const web3 = new Web3('https://rpc.ankr.com/fantom');
       //const web3 = new Web3('https://rpcapi.sonic.fantom.network/');
 
-      
+
       // Retrieve the current gas price
       /*
       window.getAggressiveGasPrice = async function() {
       try {
         // Retrieve the current gas price
         const gasPrice = await web3.eth.getGasPrice();
-
         // Convert the gas price to BigInt
         const gasPriceBigInt = BigInt(gasPrice);
-
         // Adjust the gas price by multiplying with a factor (e.g., 2 for 100% increase)
         const aggressiveGasPrice = gasPriceBigInt * BigInt(15) / BigInt(10); // Multiplies by 1.5 as an example
-
         // Convert the gas price to Gwei or other units if desired
         const aggressiveGasPriceGwei = web3.utils.fromWei(aggressiveGasPrice.toString(), 'gwei');
-
         console.log('Aggressive gas price:', aggressiveGasPriceGwei, 'Gwei');
         window.unityInstance.SendMessage("Web3Manager", "UpdateGasPrice", aggressiveGasPrice.toString());
         return aggressiveGasPrice.toString(); // Return the aggressive gas price
@@ -229,7 +215,6 @@
         throw error; // Throw the error
       }
     };
-
     let zzz = window.getAggressiveGasPrice();
     console.log('zzzAggressive gas price:', zzz);
  */ 
@@ -237,12 +222,12 @@
 
 <script>
   let deferredPrompt;
-  
+
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
   });
-  
+
   function showInstallPrompt() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -256,6 +241,129 @@
       });
     }
   }
+  // Function to create a button and append it to the body
+  function createInstallButton() {
+    // Create a new button element
+    const button = document.createElement('button');
+
+    // Set button text
+    button.innerText = 'Install';
+
+    // Add a click event listener to the button that calls showInstallPrompt
+    button.addEventListener('click', showInstallPrompt);
+
+    // Append the button to the body (or any other desired container)
+    document.body.appendChild(button);
+  }
+
+  // Call the function to create and display the install button
+  createInstallButton();
+
+
+
+
+
+//-----------------------------version checking-------------------------------------------------
+
+async function checkForUpdate() {
+  try {
+    const currentVersion = await getCachedVersion(); // Get the version from the cache
+    const latestVersion = await fetchLatestVersion(); // Fetch the latest version from the server
+
+    console.log('CURRENT version:', currentVersion);
+    console.log('LATEST version:', latestVersion);
+
+    // Compare versions, refresh if a new version is detected
+    if (latestVersion && currentVersion && currentVersion !== latestVersion) {
+      console.log('New version available:', latestVersion);
+
+      // Unregister all service workers
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let registration of registrations) {
+          console.log('Unregistering service worker:', registration);
+          await registration.unregister(); // Unregister old service worker
+        }
+      }
+
+      // Clear all caches
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map((cacheName) => {
+          console.log('Deleting cache:', cacheName);
+          return caches.delete(cacheName); // Delete each cache
+        })
+      );
+
+      // Reload page to register the new service worker and fetch fresh content
+      console.log('Reloading page to apply new version...');
+      window.location.reload(true);
+    }
+  } catch (error) {
+    console.error('Error during version check:', error);
+  }
+}
+
+
+
+  // Function to fetch the latest version.json from the server
+  async function fetchLatestVersion() {
+    try {
+      const response = await fetch('/version.json', { cache: 'no-store' });
+      const data = await response.json();
+      return data.version;
+    } catch (error) {
+      console.error('Error fetching latest version:', error);
+      return null;
+    }
+  }
+
+  // Function to get the version cached by the service worker
+
+  async function getCachedVersion() {
+  try {
+    const CACHE_NAME = 'fa-rpg-cache-v1'; // Ensure the same cache name is used here too!
+
+    const cache = await caches.open(CACHE_NAME); // Open the cache
+    console.log('CACHE NAME:',CACHE_NAME);
+    const cachedResponse = await cache.match('/version.json'); // Look for version.json in cache
+
+    if (cachedResponse) {
+      const data = await cachedResponse.json();
+      console.log('Cached version.json data:', data); // Log the content of version.json
+      return data.version; // Return the version key
+    } else {
+      console.warn('version.json not found in cache'); // Warn if not found in cache
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching cached version:', error);
+    return null;
+  }
+}
+
+  // Call this function periodically or on page load to check for updates
+  setInterval(checkForUpdate, 600000); // Check every 60 minute
+  // Delay the execution of checkForUpdate by 3 seconds after the page is loaded
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      checkForUpdate();
+    }, 5000); // 3000 milliseconds = 3 seconds
+  });
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('Service Worker registered successfully:', registration.scope);
+        })
+        .catch(error => {
+          console.log('Service Worker registration failed:', error);
+        });
+    });
+  }
+//----------------------------------------------------------------------
+     
   </script>
 
 

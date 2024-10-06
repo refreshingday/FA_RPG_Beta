@@ -2,6 +2,7 @@ const CACHE_NAME = 'fa-rpg-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/version.json', // This file should always be revalidated
   '/TemplateData/style.css',
   '/index.js',
   '/reroute.js',
@@ -19,35 +20,69 @@ const urlsToCache = [
   '/TemplateData/progress-bar-full-dark.png'
 ];
 
+// During installation, cache important files
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(urlsToCache.map(url => new Request(url, {credentials: 'same-origin'})));
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(urlsToCache.map(url => new Request(url, { credentials: 'same-origin' })));
+    })
+  );
+  self.skipWaiting(); // Skip waiting, activate immediately after install
+});
+
+// Activate the service worker and remove old caches
+self.addEventListener('activate', (event) => {
+  const cacheWhitelist = [CACHE_NAME]; // Only keep the current version
+
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (!cacheWhitelist.includes(cacheName)) {
+            // Delete old caches
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
+      // Claim clients to immediately take control of all open tabs
+      return self.clients.claim();
+    })
   );
 });
 
+// Fetch handler
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then(
-          (response) => {
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-            return response;
+    caches.match(event.request).then((response) => {
+      if (response) {
+        // If we have a cached response, check if we should update it
+        fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache); // Update cache
+            });
           }
-        );
-      })
+        });
+        return response; // Return the cached response
+      }
+      return fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache); // Cache the new response
+          });
+        }
+        return networkResponse; // Return network response
+      });
+    })
   );
+});
+
+// Listen for messages to skip waiting and immediately activate new service worker
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting(); // Trigger skip waiting when message is received
+  }
 });
